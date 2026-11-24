@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JK Pulse | MCQ Studio</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="app-header">
+  <div>
+    <h1>JK PULSE</h1>
+    <p>MCQ REEL STUDIO</p>
+  </div>
+  <span class="studio-tag">CREATOR STUDIO</span>
+</header>
+
+<nav class="screen-nav">
+  <button class="nav-btn active" data-screen="mcqScreen">01 MCQ</button>
+  <button class="nav-btn" data-screen="sceneScreen">02 Scenes</button>
+  <button class="nav-btn" data-screen="voiceScreen">03 Voice</button>
+  <button class="nav-btn" data-screen="musicScreen">04 Music</button>
+  <button class="nav-btn" data-screen="exportScreen">05 Export</button>
+</nav>
+
+<main class="studio">
+
+<section class="screen active" id="mcqScreen">
+  <div class="screen-heading">
+    <span>STEP 01 / CONTENT</span>
+    <h2>Create your MCQ</h2>
+    <p>Enter your question and answer details.</p>
+  </div>
+
+  <section class="editor">
+    <label>Question</label>
+    <textarea id="question" placeholder="Enter your question"></textarea>
+
+    <div class="field-grid">
+      <div><label>Option A</label><input id="optionA" placeholder="Option A"></div>
+      <div><label>Option B</label><input id="optionB" placeholder="Option B"></div>
+      <div><label>Option C</label><input id="optionC" placeholder="Option C"></div>
+      <div><label>Option D</label><input id="optionD" placeholder="Option D"></div>
+    </div>
+
+    <label>Correct Answer</label>
+    <select id="answer">
+      <option value="A">Option A</option>
+      <option value="B">Option B</option>
+      <option value="C">Option C</option>
+      <option value="D">Option D</option>
+    </select>
+
+    <label>Explanation</label>
+    <textarea id="explanation" placeholder="Explain the correct answer"></textarea>
+
+    <button id="previewBtn" class="primary-btn">Generate 7 Scenes →</button>
+  </section>
+</section>
+
+<section class="screen" id="sceneScreen">
+  <div class="screen-heading">
+    <span>STEP 02 / STORYBOARD</span>
+    <h2>Scene Preview</h2>
+    <p>Preview your generated vertical video scenes.</p>
+  </div>
+  <section class="preview">
+    <div id="slide">
+      <h3>JK PULSE</h3>
+      <p>Your MCQ presentation will appear here.</p>
+    </div>
+  </section>
+</section>
+
+<section class="screen" id="voiceScreen">
+  <div class="screen-heading">
+    <span>STEP 03 / NARRATION</span>
+    <h2>Voice Studio</h2>
+    <p>Record and preview narration separately for every scene.</p>
+  </div>
+  <div id="voicePlaceholder" class="editor">
+    <p>Generate your seven scenes first. Your individual recording controls will appear here.</p>
+  </div>
+</section>
+
+<section class="screen" id="musicScreen">
+  <div class="screen-heading">
+    <span>STEP 04 / AUDIO</span>
+    <h2>Background Music</h2>
+    <p>Add background music to your MCQ video.</p>
+  </div>
+  <section class="editor" id="musicPanel">
+    <label for="musicFile">Upload background music</label>
+    <input type="file" id="musicFile" accept="audio/*">
+
+    <label for="musicVolume">Music Volume: <span id="musicVolumeValue">10%</span></label>
+    <input type="range" id="musicVolume" min="0" max="30" value="10">
+
+    <button type="button" id="playMusicBtn">Preview Music</button>
+    <button type="button" id="stopMusicBtn" class="secondary-btn">Stop Music</button>
+    <p id="musicStatus">No music selected.</p>
+  </section>
+</section>
+
+<section class="screen" id="exportScreen">
+  <div class="screen-heading">
+    <span>STEP 05 / FINAL VIDEO</span>
+    <h2>Export Studio</h2>
+    <p>Combine your scenes, voice recordings and music.</p>
+  </div>
+  <section class="editor" id="exportPanel">
+    <label for="sceneDuration">Minimum scene duration (seconds)</label>
+    <input type="number" id="sceneDuration" min="2" max="30" value="4">
+
+    <button type="button" id="exportBtn" class="primary-btn">Create Complete Video</button>
+    <p id="exportStatus">Ready to export.</p>
+
+    <video id="exportPreview" controls playsinline></video>
+
+    <a id="downloadVideo" download="JK-Pulse-MCQ-Video.webm">Download Video</a>
+  </section>
+</section>
+
+<div class="step-controls">
+  <button type="button" id="prevScreen" class="secondary-btn">← Previous</button>
+  <span id="stepIndicator">1 / 5</span>
+  <button type="button" id="nextScreen" class="primary-btn">Next →</button>
+</div>
+
+</main>
+
+<script src="js/app.js"></script>
+<script src="js/export.js"></script>
+<script>
+(() => {
+  const screens = [...document.querySelectorAll(".screen")];
+  const navButtons = [...document.querySelectorAll(".nav-btn")];
+  let current = 0;
+
+  function showScreen(index) {
+    current = Math.max(0, Math.min(index, screens.length - 1));
+    screens.forEach((screen, i) => screen.classList.toggle("active", i === current));
+    navButtons.forEach((button, i) => button.classList.toggle("active", i === current));
+    document.getElementById("stepIndicator").textContent = `${current + 1} / ${screens.length}`;
+    document.getElementById("prevScreen").disabled = current === 0;
+    document.getElementById("nextScreen").textContent = current === screens.length - 1 ? "Finish" : "Next →";
+    window.scrollTo({top: 0, behavior: "smooth"});
+  }
+
+  navButtons.forEach((button, i) => button.addEventListener("click", () => showScreen(i)));
+  document.getElementById("prevScreen").addEventListener("click", () => showScreen(current - 1));
+  document.getElementById("nextScreen").addEventListener("click", () => showScreen(current === screens.length - 1 ? 0 : current + 1));
+
+  const voiceScreen = document.getElementById("voiceScreen");
+  const observer = new MutationObserver(() => {
+    const panel = document.getElementById("sceneRecordings");
+    if (panel && panel.parentElement !== voiceScreen) {
+      document.getElementById("voicePlaceholder")?.remove();
+      voiceScreen.appendChild(panel);
+    }
+  });
+  observer.observe(document.body, {childList: true, subtree: true});
+  showScreen(0);
+})();
+</script>
+</body>
+</html>
