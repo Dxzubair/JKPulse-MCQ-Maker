@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>JK Pulse | MCQ Studio</title>
 <link rel="stylesheet" href="css/style.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#080d19">
 </head>
 <body>
 
@@ -164,5 +166,16 @@
   showScreen(0);
 })();
 </script>
+
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./service-worker.js")
+      .then(() => console.log("JK Pulse offline support enabled"))
+      .catch(error => console.error("Service worker registration failed:", error));
+  });
+}
+</script>
+
 </body>
 </html>
