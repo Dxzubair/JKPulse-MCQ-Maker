@@ -153,7 +153,10 @@ function drawScene(ctx, scene, index, total, progress, sceneElapsed = 0) {
     "text/html"
   );
 
-  const blocks = Array.from(doc.body.children);
+  const sceneRoot = doc.querySelector(".scene") || doc.body;
+  const blocks = Array.from(sceneRoot.querySelectorAll(
+    ".scene-number, h2, .option, .countdown, .correct-letter, .explanation, .slide-footer, p"
+  ));
   let y = 520;
 
   ctx.textAlign = "center";
