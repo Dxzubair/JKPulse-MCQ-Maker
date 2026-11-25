@@ -1,4 +1,4 @@
-const CACHE_NAME = "jk-pulse-mcq-v1";
+const CACHE_NAME = "jk-pulse-mcq-v2";
 
 const APP_FILES = [
   "./",

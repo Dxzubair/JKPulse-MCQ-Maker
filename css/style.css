@@ -444,3 +444,100 @@ button:disabled {
   input, textarea, select { font-size: 14px; }
   #slide { padding: 18px 12px; }
 }
+
+/* MCQ Reel Format Selection */
+.format-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.format-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  min-height: 145px;
+  padding: 16px;
+  margin: 0;
+  background: linear-gradient(145deg, #192640, #101827);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+}
+
+.format-card.selected {
+  border: 2px solid var(--gold);
+  background: linear-gradient(145deg, #293653, #17243a);
+}
+
+.format-icon {
+  color: var(--gold);
+  font-size: 12px;
+  margin-bottom: 15px;
+}
+
+.format-card strong {
+  font-size: 15px;
+  margin-bottom: 7px;
+}
+
+.format-card small {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+  font-weight: normal;
+}
+
+#continueFormat {
+  width: 100%;
+  padding: 15px;
+}
+
+@media (max-width: 420px) {
+  .format-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .format-card { min-height: 135px; padding: 12px; }
+}
+
+/* Five MCQ Reel Format Themes */
+.scene.theme-classic {
+  background: linear-gradient(145deg, #172746, #080d19);
+  border: 2px solid #f5c451;
+  padding: 25px;
+  border-radius: 16px;
+}
+
+.scene.theme-challenge {
+  background: linear-gradient(145deg, #401b28, #100b17);
+  border: 2px solid #ff5964;
+  padding: 25px;
+  border-radius: 16px;
+}
+
+.scene.theme-fact {
+  background: linear-gradient(145deg, #103b42, #07171e);
+  border: 2px solid #48e0c1;
+  padding: 25px;
+  border-radius: 16px;
+}
+
+.scene.theme-history {
+  background: linear-gradient(145deg, #42251f, #160e12);
+  border: 4px double #e7b66b;
+  padding: 25px;
+  border-radius: 8px;
+}
+
+.scene.theme-exam {
+  background: linear-gradient(145deg, #183b66, #081426);
+  border: 2px solid #72b9ff;
+  padding: 25px;
+  border-radius: 12px;
+}
+
+.theme-challenge .scene-number { color: #ff5964; }
+.theme-fact .scene-number { color: #48e0c1; }
+.theme-history .scene-number { color: #e7b66b; }
+.theme-exam .scene-number { color: #72b9ff; }
+

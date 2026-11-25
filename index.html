@@ -19,16 +19,53 @@
 </header>
 
 <nav class="screen-nav">
-  <button class="nav-btn active" data-screen="mcqScreen">01 MCQ</button>
-  <button class="nav-btn" data-screen="sceneScreen">02 Scenes</button>
-  <button class="nav-btn" data-screen="voiceScreen">03 Voice</button>
-  <button class="nav-btn" data-screen="musicScreen">04 Music</button>
-  <button class="nav-btn" data-screen="exportScreen">05 Export</button>
+  <button class="nav-btn active" data-screen="formatScreen">01 Format</button>
+  <button class="nav-btn" data-screen="mcqScreen">02 MCQ</button>
+  <button class="nav-btn" data-screen="sceneScreen">03 Scenes</button>
+  <button class="nav-btn" data-screen="voiceScreen">04 Voice</button>
+  <button class="nav-btn" data-screen="musicScreen">05 Music</button>
+  <button class="nav-btn" data-screen="exportScreen">06 Export</button>
 </nav>
 
 <main class="studio">
 
-<section class="screen active" id="mcqScreen">
+<section class="screen active" id="formatScreen">
+  <div class="screen-heading">
+    <span>STEP 01 / STYLE</span>
+    <h2>Choose Your Reel Format</h2>
+    <p>Select how you want your MCQ reel to look and tell its story.</p>
+  </div>
+  <div class="format-grid">
+    <button type="button" class="format-card selected" data-format="classic">
+      <span class="format-icon">01</span>
+      <strong>Classic Quiz</strong>
+      <small>Question, options, countdown and explanation</small>
+    </button>
+    <button type="button" class="format-card" data-format="challenge">
+      <span class="format-icon">02</span>
+      <strong>Challenge Mode</strong>
+      <small>Hook, challenge, reveal and audience engagement</small>
+    </button>
+    <button type="button" class="format-card" data-format="fact">
+      <span class="format-icon">03</span>
+      <strong>Fact Explainer</strong>
+      <small>Surprising fact, question and deeper explanation</small>
+    </button>
+    <button type="button" class="format-card" data-format="history">
+      <span class="format-icon">04</span>
+      <strong>History Mystery</strong>
+      <small>Historical mystery, reveal and context</small>
+    </button>
+    <button type="button" class="format-card" data-format="exam">
+      <span class="format-icon">05</span>
+      <strong>Exam Practice</strong>
+      <small>Exam-style question, timer and learning point</small>
+    </button>
+  </div>
+  <button type="button" id="continueFormat" class="primary-btn">Continue to MCQ →</button>
+</section>
+
+<section class="screen" id="mcqScreen">
   <div class="screen-heading">
     <span>STEP 01 / CONTENT</span>
     <h2>Create your MCQ</h2>
@@ -149,6 +186,22 @@
     document.getElementById("nextScreen").textContent = current === screens.length - 1 ? "Finish" : "Next →";
     window.scrollTo({top: 0, behavior: "smooth"});
   }
+
+  let selectedFormat = "classic";
+
+  document.querySelectorAll(".format-card").forEach(card => {
+    card.addEventListener("click", () => {
+      selectedFormat = card.dataset.format;
+      document.querySelectorAll(".format-card").forEach(item =>
+        item.classList.toggle("selected", item === card)
+      );
+    });
+  });
+
+  document.getElementById("continueFormat").addEventListener("click", () => {
+    window.JKPulseSelectedFormat = selectedFormat;
+    showScreen(1);
+  });
 
   navButtons.forEach((button, i) => button.addEventListener("click", () => showScreen(i)));
   document.getElementById("prevScreen").addEventListener("click", () => showScreen(current - 1));

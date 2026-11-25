@@ -100,13 +100,14 @@ previewBtn.addEventListener("click", () => {
   const q = escapeHTML(question);
   const exp = escapeHTML(explanation);
   const answerText = escapeHTML(options[answer]);
+  const format = window.JKPulseSelectedFormat || "classic";
 
   const optionHTML = Object.entries(options).map(([key, value]) =>
     `<div class="option"><strong>${key}.</strong> ${escapeHTML(value)}</div>`
   ).join("");
 
   const makeSlide = (label, heading, body) => `
-    <div class="scene">
+    <div class="scene theme-${format}">
       <h3>JK PULSE</h3>
       <div class="scene-number">${label}</div>
       <h2>${heading}</h2>
@@ -114,49 +115,140 @@ previewBtn.addEventListener("click", () => {
     </div>
   `;
 
-  scenes = [
-    createScene(
-      "Introduction",
-      makeSlide("DAILY KNOWLEDGE CHALLENGE", "TEST YOUR KNOWLEDGE",
-        '<p class="slide-footer">LET’S BEGIN</p>'),
-      "Welcome to JK Pulse. Let's test your knowledge with today's question."
-    ),
-    createScene(
-      "Question",
-      makeSlide("QUESTION", q, `<div class="options">${optionHTML}</div>`),
-      `Here is your question. ${question}. The options are: A, ${options.A}. B, ${options.B}. C, ${options.C}. D, ${options.D}.`
-    ),
-    createScene(
-      "Think",
-      makeSlide("YOUR TURN", "THINK CAREFULLY!",
-        '<p class="slide-footer">YOU HAVE FIVE SECONDS</p>'),
-      "Take a moment to think and comment your answer."
-    ),
-    createScene(
-      "Countdown",
-      makeSlide("TIME TO ANSWER", "5 SECONDS",
-        '<div class="countdown">5</div><p class="slide-footer">COMMENT YOUR ANSWER</p>'),
-      "Five, four, three, two, one. Time is up."
-    ),
-    createScene(
-      "Correct Answer",
-      makeSlide("CORRECT ANSWER",
-        `<div class="correct-letter">${answer}</div><h2>${answer}. ${answerText}</h2>`, ""),
-      `The correct answer is option ${answer}. ${options[answer]}.`
-    ),
-    createScene(
-      "Explanation",
-      makeSlide("EXPLANATION", answerText,
-        `<p class="explanation">${exp}</p>`),
-      `Let's understand why. ${explanation}`
-    ),
-    createScene(
-      "Outro",
-      makeSlide("JK PULSE", "HOW MANY DID YOU GET RIGHT?",
-        '<p class="slide-footer">LIKE • SHARE • FOLLOW</p>'),
-      "Follow JK Pulse for more interesting questions. Like and share this video."
-    )
-  ];
+  const questionSlide = (label = "QUESTION") =>
+    makeSlide(label, q, `<div class="options">${optionHTML}</div>`);
+
+  const answerSlide = () =>
+    makeSlide("ANSWER REVEALED",
+      `<div class="correct-letter">${answer}</div><h2>${answer}. ${answerText}</h2>`, "");
+
+  const explanationSlide = (label = "EXPLANATION") =>
+    makeSlide(label, answerText, `<p class="explanation">${exp}</p>`);
+
+  const outroSlide = (heading = "HOW MANY DID YOU GET RIGHT?") =>
+    makeSlide("JK PULSE", heading,
+      '<p class="slide-footer">LIKE • SHARE • FOLLOW</p>');
+
+  const countdownSlide = (label = "TIME TO ANSWER") =>
+    makeSlide(label, "5 SECONDS",
+      '<div class="countdown">5</div><p class="slide-footer">YOUR TIME STARTS NOW</p>');
+
+  const formats = {
+    classic: [
+      createScene("Introduction",
+        makeSlide("DAILY KNOWLEDGE CHALLENGE", "TEST YOUR KNOWLEDGE",
+          '<p class="slide-footer">LET’S BEGIN</p>'),
+        "Welcome to JK Pulse. Let's test your knowledge with today's question."),
+      createScene("Question", questionSlide(),
+        `Here is your question. ${question}. The options are: A, ${options.A}. B, ${options.B}. C, ${options.C}. D, ${options.D}.`),
+      createScene("Think",
+        makeSlide("YOUR TURN", "THINK CAREFULLY!",
+          '<p class="slide-footer">YOU HAVE FIVE SECONDS</p>'),
+        "Take a moment to think and comment your answer."),
+      createScene("Countdown", countdownSlide(),
+        "Five, four, three, two, one. Time is up."),
+      createScene("Correct Answer", answerSlide(),
+        `The correct answer is option ${answer}. ${options[answer]}.`),
+      createScene("Explanation", explanationSlide(),
+        `Let's understand why. ${explanation}`),
+      createScene("Outro", outroSlide(),
+        "Follow JK Pulse for more interesting questions. Like and share this video.")
+    ],
+
+    challenge: [
+      createScene("Challenge Hook",
+        makeSlide("THE CHALLENGE", "CAN YOU BEAT THE CLOCK?",
+          '<p class="slide-footer">ONLY TRUE KNOWLEDGE TESTS YOU!</p>'),
+        "Here comes a challenge. Can you answer correctly before the clock runs out?"),
+      createScene("Question", questionSlide("YOUR CHALLENGE"),
+        `Here is the challenge. ${question}. Option A, ${options.A}. Option B, ${options.B}. Option C, ${options.C}. Option D, ${options.D}.`),
+      createScene("Challenge",
+        makeSlide("NO SEARCHING!", "TRUST YOUR KNOWLEDGE",
+          '<p class="slide-footer">LOCK IN YOUR ANSWER</p>'),
+        "No searching. No hints. Trust your knowledge and choose your answer."),
+      createScene("Countdown", countdownSlide("THE CLOCK IS TICKING"),
+        "Five, four, three, two, one. Make your choice."),
+      createScene("Reveal", answerSlide(),
+        `The answer is ${answer}. ${options[answer]}. Did you get it right?`),
+      createScene("Score Prompt",
+        makeSlide("BE HONEST!", "DID YOU GET IT RIGHT?",
+          '<p class="slide-footer">COMMENT YOUR SCORE BELOW</p>'),
+        "Be honest. Did you get the answer right? Tell us in the comments."),
+      createScene("Follow",
+        outroSlide("READY FOR THE NEXT CHALLENGE?"),
+        "Follow JK Pulse and challenge yourself with the next question.")
+    ],
+
+    fact: [
+      createScene("Surprising Fact",
+        makeSlide("DID YOU KNOW?", "A QUESTION THAT TESTS YOUR KNOWLEDGE",
+          '<p class="slide-footer">LET’S FIND OUT!</p>'),
+        "Did you know? Let's explore an interesting question and discover the answer."),
+      createScene("Question", questionSlide("THE BIG QUESTION"),
+        `Here is the question. ${question}. Your options are A, ${options.A}. B, ${options.B}. C, ${options.C}. D, ${options.D}.`),
+      createScene("Think",
+        makeSlide("THINK ABOUT IT", "WHAT DO YOU KNOW?",
+          '<p class="slide-footer">TAKE A MOMENT TO THINK</p>'),
+        "Think carefully. What do you already know about this topic?"),
+      createScene("Answer", answerSlide(),
+        `The correct answer is ${answer}. ${options[answer]}.`),
+      createScene("Why",
+        explanationSlide("HERE IS WHY"),
+        `Why is this the correct answer? ${explanation}`),
+      createScene("Takeaway",
+        makeSlide("REMEMBER THIS", "KNOWLEDGE IS POWER",
+          `<p class="explanation">${exp}</p>`),
+        `Remember this important point. ${explanation}`),
+      createScene("Outro", outroSlide("LEARN SOMETHING NEW EVERY DAY"),
+        "Follow JK Pulse for more facts, explanations and knowledge.")
+    ],
+
+    history: [
+      createScene("Historical Hook",
+        makeSlide("HISTORY MYSTERY", "CAN YOU SOLVE THIS?",
+          '<p class="slide-footer">A JOURNEY INTO THE PAST</p>'),
+        "Welcome to History Mystery. Let's see how well you know history."),
+      createScene("Mystery",
+        makeSlide("THE MYSTERY", "ONE QUESTION. FOUR POSSIBILITIES.",
+          '<p class="slide-footer">ONLY ONE IS CORRECT</p>'),
+        "A historical mystery awaits. Read the question and choose carefully."),
+      createScene("Question", questionSlide("HISTORICAL QUESTION"),
+        `Here is your history question. ${question}. A, ${options.A}. B, ${options.B}. C, ${options.C}. D, ${options.D}.`),
+      createScene("Countdown", countdownSlide("SOLVE THE MYSTERY"),
+        "Five, four, three, two, one. Time to reveal the answer."),
+      createScene("Reveal", answerSlide(),
+        `The mystery is solved. The correct answer is ${answer}. ${options[answer]}.`),
+      createScene("Historical Context", explanationSlide("HISTORICAL CONTEXT"),
+        `Let's understand the historical context. ${explanation}`),
+      createScene("Outro", outroSlide("HOW WELL DO YOU KNOW HISTORY?"),
+        "Follow JK Pulse for more history questions and interesting discoveries.")
+    ],
+
+    exam: [
+      createScene("Exam Intro",
+        makeSlide("JKSSB EXAM PRACTICE", "TEST YOUR PREPARATION",
+          '<p class="slide-footer">PRACTICE • LEARN • IMPROVE</p>'),
+        "Welcome to JK Pulse exam practice. Read the question carefully."),
+      createScene("Question", questionSlide("EXAM QUESTION"),
+        `Your question is. ${question}. Option A, ${options.A}. Option B, ${options.B}. Option C, ${options.C}. Option D, ${options.D}.`),
+      createScene("Choose",
+        makeSlide("EXAM MODE", "SELECT THE BEST ANSWER",
+          '<p class="slide-footer">AVOID GUESSING</p>'),
+        "Select the best answer. Read every option before making your choice."),
+      createScene("Timer", countdownSlide("EXAM TIMER"),
+        "You have five seconds. Five, four, three, two, one."),
+      createScene("Correct Answer", answerSlide(),
+        `Correct answer: option ${answer}. ${options[answer]}.`),
+      createScene("Explanation", explanationSlide("UNDERSTAND THE CONCEPT"),
+        `Understand the concept behind this question. ${explanation}`),
+      createScene("Exam Tip",
+        makeSlide("EXAM TIP", "LEARN FROM EVERY QUESTION",
+          `<p class="explanation">${exp}</p><p class="slide-footer">PRACTICE MAKES PROGRESS</p>`),
+        `Exam tip. Remember the explanation. ${explanation}`)
+    ]
+  };
+
+  scenes = formats[format] || formats.classic;
 
   recordings = {};
   renderScene(0);

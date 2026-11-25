@@ -46,28 +46,105 @@ function drawWrappedText(ctx, text, x, y, maxWidth, lineHeight) {
 function drawScene(ctx, scene, index, total, progress, sceneElapsed = 0) {
   const w = 1080;
   const h = 1920;
+  const format = window.JKPulseSelectedFormat || "classic";
+
+  const themes = {
+    classic: {
+      top: "#172746", bottom: "#080d19",
+      accent: "#f5c451", secondary: "#aab6cc",
+      border: "#f5c451"
+    },
+    challenge: {
+      top: "#401b28", bottom: "#100b17",
+      accent: "#ff5964", secondary: "#ffd4d7",
+      border: "#ff5964"
+    },
+    fact: {
+      top: "#103b42", bottom: "#07171e",
+      accent: "#48e0c1", secondary: "#c5f8ec",
+      border: "#48e0c1"
+    },
+    history: {
+      top: "#42251f", bottom: "#160e12",
+      accent: "#e7b66b", secondary: "#f3dfbd",
+      border: "#e7b66b"
+    },
+    exam: {
+      top: "#183b66", bottom: "#081426",
+      accent: "#72b9ff", secondary: "#d5e9ff",
+      border: "#72b9ff"
+    }
+  };
+
+  const theme = themes[format] || themes.classic;
 
   const gradient = ctx.createLinearGradient(0, 0, w, h);
-  gradient.addColorStop(0, "#101a32");
-  gradient.addColorStop(1, "#080d19");
+  gradient.addColorStop(0, theme.top);
+  gradient.addColorStop(1, theme.bottom);
 
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, w, h);
 
-  ctx.fillStyle = "#f5c451";
+  // Decorative format-specific backgrounds
+  ctx.globalAlpha = 0.12;
+  ctx.strokeStyle = theme.accent;
+  ctx.lineWidth = 4;
+
+  if (format === "challenge") {
+    for (let i = -500; i < 1500; i += 180) {
+      ctx.beginPath();
+      ctx.moveTo(i, 0);
+      ctx.lineTo(i + 900, 1920);
+      ctx.stroke();
+    }
+  } else if (format === "fact") {
+    for (let i = 0; i < 7; i++) {
+      ctx.beginPath();
+      ctx.arc(900, 350 + i * 210, 90 + i * 18, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+  } else if (format === "history") {
+    ctx.strokeRect(25, 25, 1030, 1870);
+    ctx.strokeRect(45, 45, 990, 1830);
+  } else if (format === "exam") {
+    for (let x = 60; x < 1080; x += 100) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, 1920);
+      ctx.stroke();
+    }
+  }
+
+  ctx.globalAlpha = 1;
+
+  // Brand heading
+  ctx.fillStyle = theme.accent;
   ctx.font = "bold 64px Arial";
   ctx.textAlign = "center";
   ctx.fillText("JK PULSE", w / 2, 150);
 
-  ctx.fillStyle = "#aab6cc";
-  ctx.font = "30px Arial";
-  ctx.fillText("JK EXAM PREP • DAILY MCQ", w / 2, 215);
+  const subtitles = {
+    classic: "DAILY KNOWLEDGE CHALLENGE",
+    challenge: "BEAT THE CLOCK",
+    fact: "DID YOU KNOW?",
+    history: "HISTORY MYSTERY",
+    exam: "EXAM PRACTICE"
+  };
 
-  ctx.strokeStyle = "#f5c451";
-  ctx.lineWidth = 3;
+  ctx.fillStyle = theme.secondary;
+  ctx.font = "30px Arial";
+  ctx.fillText(subtitles[format] || subtitles.classic, w / 2, 215);
+
+  // Main content frame
+  ctx.strokeStyle = theme.border;
+  ctx.lineWidth = format === "history" ? 6 : 3;
   ctx.strokeRect(65, 285, 950, 1320);
 
-  ctx.fillStyle = "#f5c451";
+  if (format === "history") {
+    ctx.strokeRect(85, 305, 910, 1280);
+  }
+
+  ctx.fillStyle = theme.accent;
   ctx.font = "bold 42px Arial";
   ctx.fillText(scene.title || "MCQ", w / 2, 385);
 
@@ -84,7 +161,9 @@ function drawScene(ctx, scene, index, total, progress, sceneElapsed = 0) {
   for (const block of blocks) {
     const text = block.textContent.trim();
     if (!text) continue;
-    if (scene.title === "Countdown" && text === "5") continue;
+
+    const isTimer = ["Countdown", "Timer"].includes(scene.title);
+    if (isTimer && text === "5") continue;
 
     const isOption = /^([A-D][.)]|Option [A-D])/i.test(text);
     const isAnswer = /correct answer|answer:/i.test(text);
@@ -93,7 +172,7 @@ function drawScene(ctx, scene, index, total, progress, sceneElapsed = 0) {
     ctx.fillStyle = isAnswer ? "#7be0a3" : "#ffffff";
 
     if (isOption) {
-      ctx.fillStyle = "#dce5f5";
+      ctx.fillStyle = theme.secondary;
       ctx.textAlign = "left";
       y = drawWrappedText(ctx, text, 125, y, 830, 58);
       y += 35;
@@ -106,7 +185,8 @@ function drawScene(ctx, scene, index, total, progress, sceneElapsed = 0) {
     if (y > 1430) break;
   }
 
-  if (scene.title === "Countdown") {
+  // Animated timer for countdown scenes
+  if (["Countdown", "Timer"].includes(scene.title)) {
     const number = Math.max(1, 5 - Math.floor(sceneElapsed));
     const cx = w / 2;
     const cy = 1050;
@@ -123,7 +203,7 @@ function drawScene(ctx, scene, index, total, progress, sceneElapsed = 0) {
       -Math.PI / 2,
       -Math.PI / 2 + (Math.PI * 2 * (number / 5))
     );
-    ctx.strokeStyle = "#f5c451";
+    ctx.strokeStyle = theme.accent;
     ctx.lineWidth = 22;
     ctx.lineCap = "round";
     ctx.stroke();
@@ -136,15 +216,16 @@ function drawScene(ctx, scene, index, total, progress, sceneElapsed = 0) {
     ctx.fillText(String(number), cx, cy);
 
     ctx.textBaseline = "alphabetic";
-    ctx.fillStyle = "#f5c451";
+    ctx.fillStyle = theme.accent;
     ctx.font = "bold 38px Arial";
     ctx.fillText("TIME TO ANSWER", cx, 1350);
   }
 
-  ctx.fillStyle = "#f5c451";
+  // Video progress and footer
+  ctx.fillStyle = theme.accent;
   ctx.fillRect(65, 1645, 950 * progress, 9);
 
-  ctx.fillStyle = "#aab6cc";
+  ctx.fillStyle = theme.secondary;
   ctx.font = "28px Arial";
   ctx.textAlign = "center";
   ctx.fillText(`SCENE ${index + 1} / ${total}`, w / 2, 1735);
